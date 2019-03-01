@@ -1,0 +1,49 @@
+version : '3.7'
+
+services:
+  db: 
+    image: mongo:4.0.6-xenial
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGODB_USER: root
+      MONGODB_PASS: example
+    volumes:
+      - data-volume:/data/db
+
+  api:
+    build: ./api
+    command: >
+      sh -c "npm install --only=dev &&
+             npm run watch"
+    ports: 
+      - 8080:8080
+    volumes:
+      - './api:/usr/src/app'
+    restart: always
+    deploy:
+      restart_policy:
+        condition: any
+        delay: 5s
+    links:
+      - db
+    environment:
+      - MONGO_URL=db:27017
+      - MONGO_USER=root
+      - MONGO_PASS=example
+      - DATABASE_NAME=todo
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+    links:
+      - db:mongo
+
+volumes:
+  data-volume:
