@@ -15,7 +15,8 @@ services:
   api:
     build: ./api
     command: >
-      sh -c "npm install --only=dev &&
+      sh -c "npm install
+             npm install --only=dev &&
              npm run watch"
     ports: 
       - 8080:8080
